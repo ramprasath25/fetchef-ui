@@ -1,29 +1,44 @@
-const webpack = require('webpack')
-const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+var path = require('path');
+var webpack = require('webpack');
 
 module.exports = {
-  entry: ['babel-polyfill', path.resolve(__dirname, 'src', 'main.js')],
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
-  },
-  resolve: {
-    modules: [
-      path.join(__dirname, 'src'),
-      path.join(__dirname, 'test'),
-      'node_modules'
-    ],
-    extensions: ['.js']
-  },
-  module: {
-    loaders: [{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }]
-  },
-  externals: ['window'],
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: `${__dirname}/src/index.template.html`
-    }),
-    new webpack.HotModuleReplacementPlugin()
-  ]
-}
+    devServer: {
+        inline: true,
+        contentBase: './src',
+        port: 8080,
+        historyApiFallback: true,
+        https:true
+    },
+    devtool: 'cheap-module-eval-source-map',
+    entry: './dev/js/index.js',
+    module: {
+        loaders: [
+            {
+                test: /\.jsx?$/,
+                loader: 'babel',
+                exclude: /node_modules/,
+                query: {
+                    presets: ['react', 'es2015', 'stage-2']
+                }
+            },
+            {
+                test: /\.scss/,
+                loader: 'style-loader!css-loader!sass-loader'
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
+            },{
+                test: /\.(png|jpg|gif)$/,
+                loader: 'url-loader?limit=1000000'
+            }
+        ]
+    },
+    output: {
+        path: 'src',
+        filename: 'js/bundle.min.js'
+    },
+    plugins: [
+        new webpack.optimize.OccurrenceOrderPlugin()
+    ]
+};
